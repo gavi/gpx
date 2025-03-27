@@ -91,6 +91,18 @@ def get_gpx_track(track_id: str) -> Optional[Dict[str, Any]]:
             return track_dict
         return None
 
+def get_all_tracks() -> List[Dict[str, Any]]:
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, name, description, created_at, distance, elevation_gain, duration FROM gpx_tracks")
+        results = []
+        for row in cursor.fetchall():
+            row_dict = dict(row)
+            # Rename 'id' to 'track_id' to match the Pydantic model
+            row_dict['track_id'] = row_dict.pop('id')
+            results.append(row_dict)
+        return results
 
 # Routes
 @app.get("/", response_class=HTMLResponse)
