@@ -22,7 +22,7 @@ app.add_middleware(
 )
 
 # SQLite database
-DB_PATH = './data/gpx_data.db'
+DB_PATH = './gpx_data.db'
 
 # Serve static files
 app.mount("/static", StaticFiles(directory="static", html=True), name="static")
@@ -85,15 +85,12 @@ def get_gpx_track(track_id: str) -> Optional[Dict[str, Any]]:
         cursor.execute("SELECT * FROM gpx_tracks WHERE id = ?", (track_id,))
         track = cursor.fetchone()
         if track:
-            return dict(track)
+            track_dict = dict(track)
+            # Make a copy of 'id' as 'track_id' for consistency
+            track_dict['track_id'] = track_dict['id']
+            return track_dict
         return None
 
-def get_all_tracks() -> List[Dict[str, Any]]:
-    with sqlite3.connect(DB_PATH) as conn:
-        conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, name, description, created_at, distance, elevation_gain, duration FROM gpx_tracks")
-        return [dict(row) for row in cursor.fetchall()]
 
 # Routes
 @app.get("/", response_class=HTMLResponse)

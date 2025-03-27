@@ -77,6 +77,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const result = await response.json();
             
+            // Store track ID in localStorage
+            storeMyTrackID(result.track_id);
+            
             // Show success message and share link
             const uploadResult = document.getElementById('upload-result');
             uploadResult.classList.remove('hidden');
@@ -134,14 +137,20 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const data = await response.json();
             
-            if (data.tracks.length === 0) {
+            // Get user's tracks from localStorage
+            const myTrackIDs = getMyTrackIDs();
+            
+            // Filter tracks to only show user's tracks
+            const userTracks = data.tracks.filter(track => myTrackIDs.includes(track.track_id));
+            
+            if (userTracks.length === 0) {
                 tracksContainer.innerHTML = '<p>No tracks found. Upload some tracks first!</p>';
                 return;
             }
             
             // Display tracks
             tracksContainer.innerHTML = '';
-            data.tracks.forEach(track => {
+            userTracks.forEach(track => {
                 const trackItem = document.createElement('div');
                 trackItem.className = 'track-item';
                 trackItem.innerHTML = `
@@ -290,6 +299,20 @@ document.addEventListener('DOMContentLoaded', () => {
         html += `<p><strong>Points:</strong> ${track.points.length}</p>`;
         
         detailsElement.innerHTML = html;
+    }
+    
+    // Helper Functions for localStorage track management
+    function storeMyTrackID(trackId) {
+        const myTracks = getMyTrackIDs();
+        if (!myTracks.includes(trackId)) {
+            myTracks.push(trackId);
+            localStorage.setItem('myTracks', JSON.stringify(myTracks));
+        }
+    }
+    
+    function getMyTrackIDs() {
+        const tracks = localStorage.getItem('myTracks');
+        return tracks ? JSON.parse(tracks) : [];
     }
     
     // Parse GPX file
