@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize map with zoom control in bottom right
+    // Initialize map with no zoom control initially
     const sharedMap = L.map('map-fullscreen', {
         zoomControl: false
     }).setView([51.505, -0.09], 13);
