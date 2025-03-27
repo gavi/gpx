@@ -91,11 +91,19 @@ def get_gpx_track(track_id: str) -> Optional[Dict[str, Any]]:
             return track_dict
         return None
 
-def get_all_tracks() -> List[Dict[str, Any]]:
+def get_tracks_by_ids(track_ids: List[str]) -> List[Dict[str, Any]]:
+    if not track_ids:
+        return []
+    
+    # Create placeholder string for SQL IN clause
+    placeholders = ','.join(['?'] * len(track_ids))
+    
     with sqlite3.connect(DB_PATH) as conn:
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
-        cursor.execute("SELECT id, name, description, created_at, distance, elevation_gain, duration FROM gpx_tracks")
+        query = f"SELECT id, name, description, created_at, distance, elevation_gain, duration FROM gpx_tracks WHERE id IN ({placeholders})"
+        cursor.execute(query, track_ids)
+        
         results = []
         for row in cursor.fetchall():
             row_dict = dict(row)
@@ -141,9 +149,10 @@ async def upload_gpx(
     
     return GPXUploadResponse(track_id=track_id, share_url=share_url)
 
-@app.get("/api/tracks", response_model=GPXList)
-async def list_tracks():
-    tracks = get_all_tracks()
+
+@app.post("/api/my-tracks", response_model=GPXList)
+async def get_my_tracks(track_ids: List[str]):
+    tracks = get_tracks_by_ids(track_ids)
     return GPXList(tracks=[GPXTrackInfo(**track) for track in tracks])
 
 @app.get("/api/track/{track_id}")

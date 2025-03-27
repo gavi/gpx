@@ -129,19 +129,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const tracksContainer = document.getElementById('tracks-container');
         
         try {
-            const response = await fetch('/api/tracks');
+            // Get user's tracks from localStorage
+            const myTrackIDs = getMyTrackIDs();
+            
+            if (myTrackIDs.length === 0) {
+                tracksContainer.innerHTML = '<p>No tracks found. Upload some tracks first!</p>';
+                return;
+            }
+            
+            // Fetch only the user's tracks from the server
+            const response = await fetch('/api/my-tracks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(myTrackIDs)
+            });
             
             if (!response.ok) {
                 throw new Error('Failed to load tracks');
             }
             
             const data = await response.json();
-            
-            // Get user's tracks from localStorage
-            const myTrackIDs = getMyTrackIDs();
-            
-            // Filter tracks to only show user's tracks
-            const userTracks = data.tracks.filter(track => myTrackIDs.includes(track.track_id));
+            const userTracks = data.tracks;
             
             if (userTracks.length === 0) {
                 tracksContainer.innerHTML = '<p>No tracks found. Upload some tracks first!</p>';
