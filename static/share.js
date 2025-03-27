@@ -1,6 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize map
-    const sharedMap = L.map('map-fullscreen').setView([51.505, -0.09], 13);
+    // Initialize map with zoom control in bottom right
+    const sharedMap = L.map('map-fullscreen', {
+        zoomControl: false
+    }).setView([51.505, -0.09], 13);
+    
+    // Add zoom control to bottom right
+    L.control.zoom({
+        position: 'bottomright'
+    }).addTo(sharedMap);
     
     // Add tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
