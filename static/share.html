@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared GPX Track</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 id="track-title">Shared GPX Track</h1>
+            <p id="track-description"></p>
+        </div>
+        
+        <div id="map-container">
+            <div id="shared-map"></div>
+            <div id="shared-track-info" class="track-info">
+                <h3>Track Information</h3>
+                <div id="shared-track-details"></div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>
+                <a href="/" class="btn">Upload Your Own Track</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // The track ID is embedded in the HTML when served
+        const trackId = "{{TRACK_ID}}";
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script src="/static/share.js"></script>
+</body>
+</html>
