@@ -8,74 +8,67 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>GPX Track Viewer</h1>
-        </div>
-        
+    <div id="map-fullscreen"></div>
+    
+    <div class="floating-header">
+        <h1>GPX Track Viewer</h1>
         <div class="tabs">
             <button class="tab-btn active" data-tab="upload">Upload Track</button>
             <button class="tab-btn" data-tab="tracks">My Tracks</button>
         </div>
-        
-        <div class="tab-content active" id="upload-tab">
-            <div class="upload-form">
-                <form id="gpx-upload-form">
-                    <div class="form-group">
-                        <label for="track-name">Track Name *</label>
-                        <input type="text" id="track-name" name="name" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="track-description">Description</label>
-                        <textarea id="track-description" name="description"></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="gpx-file">GPX File *</label>
-                        <input type="file" id="gpx-file" name="gpx_file" accept=".gpx" required>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="submit" id="upload-btn">Upload Track</button>
-                    </div>
-                </form>
-                
-                <div id="upload-result" class="hidden">
-                    <h3>Track Uploaded Successfully!</h3>
-                    <p>Your track has been uploaded and is available at:</p>
-                    <div class="share-link">
-                        <input type="text" id="share-url" readonly>
-                        <button id="copy-btn">Copy</button>
-                    </div>
-                    <p>You can also access this track in the "My Tracks" tab.</p>
+    </div>
+    
+    <div class="floating-panel active" id="upload-tab">
+        <div class="panel-content">
+            <form id="gpx-upload-form">
+                <div class="form-group">
+                    <label for="track-name">Track Name *</label>
+                    <input type="text" id="track-name" name="name" required>
                 </div>
+                
+                <div class="form-group">
+                    <label for="track-description">Description</label>
+                    <textarea id="track-description" name="description"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="gpx-file">GPX File *</label>
+                    <input type="file" id="gpx-file" name="gpx_file" accept=".gpx" required>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" id="upload-btn">Upload Track</button>
+                </div>
+            </form>
+            
+            <div id="upload-result" class="hidden">
+                <h3>Track Uploaded Successfully!</h3>
+                <p>Your track has been uploaded and is available at:</p>
+                <div class="share-link">
+                    <input type="text" id="share-url" readonly>
+                    <button id="copy-btn">Copy</button>
+                </div>
+                <p>You can also access this track in the "My Tracks" tab.</p>
             </div>
             
-            <div id="map-container">
-                <div id="map-upload"></div>
-                <div id="track-info" class="track-info hidden">
-                    <h3>Track Information</h3>
-                    <div id="track-details"></div>
-                </div>
+            <div id="track-info" class="track-info hidden">
+                <h3>Track Information</h3>
+                <div id="track-details"></div>
             </div>
         </div>
-        
-        <div class="tab-content" id="tracks-tab">
-            <div class="tracks-list">
-                <h2>My Tracks</h2>
-                <p class="tab-description">Tracks you've uploaded from this device</p>
-                <div id="tracks-container">
-                    <p>Loading tracks...</p>
-                </div>
+    </div>
+    
+    <div class="floating-panel" id="tracks-tab">
+        <div class="panel-content">
+            <h2>My Tracks</h2>
+            <p class="tab-description">Tracks you've uploaded from this device</p>
+            <div id="tracks-container">
+                <p>Loading tracks...</p>
             </div>
             
-            <div id="selected-track-map-container">
-                <div id="map-tracks"></div>
-                <div id="selected-track-info" class="track-info hidden">
-                    <h3>Track Information</h3>
-                    <div id="selected-track-details"></div>
-                </div>
+            <div id="selected-track-info" class="track-info hidden">
+                <h3>Track Information</h3>
+                <div id="selected-track-details"></div>
             </div>
         </div>
     </div>

@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize map
-    const sharedMap = L.map('shared-map').setView([51.505, -0.09], 13);
+    const sharedMap = L.map('map-fullscreen').setView([51.505, -0.09], 13);
     
     // Add tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

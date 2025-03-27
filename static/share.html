@@ -8,24 +8,20 @@
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1 id="track-title">Shared GPX Track</h1>
+    <div id="map-fullscreen"></div>
+    
+    <div class="floating-header">
+        <h1 id="track-title">Shared GPX Track</h1>
+        <a href="/" class="btn">Upload Your Own Track</a>
+    </div>
+    
+    <div class="floating-panel active" id="track-panel">
+        <div class="panel-content">
             <p id="track-description"></p>
-        </div>
-        
-        <div id="map-container">
-            <div id="shared-map"></div>
             <div id="shared-track-info" class="track-info">
                 <h3>Track Information</h3>
                 <div id="shared-track-details"></div>
             </div>
-        </div>
-        
-        <div class="footer">
-            <p>
-                <a href="/" class="btn">Upload Your Own Track</a>
-            </p>
         </div>
     </div>
 

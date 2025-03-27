@@ -1,20 +1,26 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize maps
-    const uploadMap = L.map('map-upload').setView([51.505, -0.09], 13);
-    const tracksMap = L.map('map-tracks').setView([51.505, -0.09], 13);
+    // Initialize the fullscreen map with zoom control in bottom right
+    const fullscreenMap = L.map('map-fullscreen', {
+        zoomControl: false
+    }).setView([51.505, -0.09], 13);
     
-    // Add tile layers
+    // Add zoom control to bottom right
+    L.control.zoom({
+        position: 'bottomright'
+    }).addTo(fullscreenMap);
+    
+    // Add tile layer to the fullscreen map
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(uploadMap);
+    }).addTo(fullscreenMap);
     
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(tracksMap);
+    // Track layers for different tabs
+    const uploadTrackLayer = L.layerGroup().addTo(fullscreenMap);
+    const tracksTrackLayer = L.layerGroup().addTo(fullscreenMap);
     
     // Tab switching
     const tabButtons = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
+    const floatingPanels = document.querySelectorAll('.floating-panel');
     
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -24,16 +30,20 @@ document.addEventListener('DOMContentLoaded', () => {
             tabButtons.forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
             
-            // Show active tab content
-            tabContents.forEach(content => content.classList.remove('active'));
+            // Show active floating panel
+            floatingPanels.forEach(panel => panel.classList.remove('active'));
             document.getElementById(`${tabName}-tab`).classList.add('active');
             
-            // Refresh maps when tab changes (fixes layout issues)
-            uploadMap.invalidateSize();
-            tracksMap.invalidateSize();
+            // Refresh map when tab changes (fixes layout issues)
+            fullscreenMap.invalidateSize();
             
-            // Load tracks list when switching to tracks tab
-            if (tabName === 'tracks') {
+            // Show appropriate track layer
+            if (tabName === 'upload') {
+                uploadTrackLayer.addTo(fullscreenMap);
+                tracksTrackLayer.removeFrom(fullscreenMap);
+            } else if (tabName === 'tracks') {
+                uploadTrackLayer.removeFrom(fullscreenMap);
+                tracksTrackLayer.addTo(fullscreenMap);
                 loadTracks();
             }
         });
@@ -117,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const track = parseGPX(gpxString);
             
             if (track) {
-                displayTrackOnMap(track, uploadMap, 'track-details');
+                displayTrackOnMap(track, uploadTrackLayer, 'track-details');
                 currentUploadTrack = track;
             }
         };
@@ -219,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const parsedTrack = parseGPX(track.gpx_data);
             
             if (parsedTrack) {
-                displayTrackOnMap(parsedTrack, tracksMap, 'selected-track-details');
+                displayTrackOnMap(parsedTrack, tracksTrackLayer, 'selected-track-details');
                 currentSelectedTrack = parsedTrack;
                 
                 // Show track info
@@ -236,21 +246,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // Helper Functions
     
     // Display track on map
-    function displayTrackOnMap(track, map, detailsElementId) {
-        // Clear previous tracks
-        map.eachLayer(layer => {
-            if (layer instanceof L.Polyline || layer instanceof L.Marker) {
-                map.removeLayer(layer);
-            }
-        });
+    function displayTrackOnMap(track, layerGroup, detailsElementId) {
+        // Clear previous track from layer group
+        layerGroup.clearLayers();
         
         // Create polyline for the track
         const points = track.points.map(p => [p.lat, p.lon]);
-        const polyline = L.polyline(points, { color: '#4285F4', weight: 5 }).addTo(map);
+        const polyline = L.polyline(points, { color: '#4285F4', weight: 5 }).addTo(layerGroup);
         
         // Set map view to track bounds
         const { minLat, maxLat, minLon, maxLon } = track.bounds;
-        map.fitBounds([
+        fullscreenMap.fitBounds([
             [minLat, minLon],
             [maxLat, maxLon]
         ]);
@@ -265,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 className: 'start-marker',
                 html: '<div style="background-color: green; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>'
             })
-        }).addTo(map);
+        }).addTo(layerGroup);
         
         const endMarker = L.marker([endPoint.lat, endPoint.lon], {
             title: 'End',
@@ -273,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 className: 'end-marker',
                 html: '<div style="background-color: red; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>'
             })
-        }).addTo(map);
+        }).addTo(layerGroup);
         
         // Display track info
         displayTrackInfo(track, detailsElementId);
