@@ -159,9 +159,47 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Display track on map
     function displayTrackOnMap(track) {
-        // Create polyline for the track
-        const points = track.points.map(p => [p.lat, p.lon]);
-        const polyline = L.polyline(points, { color: '#4285F4', weight: 5 }).addTo(sharedMap);
+        // Check if track points have elevation data
+        const hasElevation = track.points.some(p => p.elevation !== null);
+        
+        if (hasElevation) {
+            // Create hotline for elevation visualization
+            const pointsWithElevation = track.points.map(p => {
+                // Create a LatLng with z value for elevation
+                const latlng = L.latLng(p.lat, p.lon);
+                latlng.alt = p.elevation || 0; // Use 0 if elevation is null/undefined
+                return latlng;
+            });
+            
+            // Find min and max elevation for the color scale
+            let minElevation = Infinity;
+            let maxElevation = -Infinity;
+            
+            track.points.forEach(p => {
+                if (p.elevation !== null) {
+                    minElevation = Math.min(minElevation, p.elevation);
+                    maxElevation = Math.max(maxElevation, p.elevation);
+                }
+            });
+            
+            // Create hotline with elevation data
+            const hotline = L.hotline(pointsWithElevation, {
+                min: minElevation,
+                max: maxElevation,
+                palette: {
+                    0.0: 'green',
+                    0.5: 'yellow',
+                    1.0: 'red'
+                },
+                weight: 5,
+                outlineColor: '#333',
+                outlineWidth: 1
+            }).addTo(sharedMap);
+        } else {
+            // Fallback to standard polyline if no elevation data
+            const points = track.points.map(p => [p.lat, p.lon]);
+            const polyline = L.polyline(points, { color: '#4285F4', weight: 5 }).addTo(sharedMap);
+        }
         
         // Set map view to track bounds
         const { minLat, maxLat, minLon, maxLon } = track.bounds;
@@ -201,9 +239,41 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let html = `<p><strong>Distance:</strong> ${(stats.distance / 1000).toFixed(2)} km</p>`;
         
+        // Check if track has elevation data
+        const hasElevation = track.points.some(p => p.elevation !== null);
+        
         if (stats.elevGain && stats.elevLoss) {
             html += `<p><strong>Elevation Gain:</strong> ${stats.elevGain.toFixed(0)} m</p>`;
             html += `<p><strong>Elevation Loss:</strong> ${stats.elevLoss.toFixed(0)} m</p>`;
+            
+            // Add elevation range if available
+            if (hasElevation) {
+                let minElevation = Infinity;
+                let maxElevation = -Infinity;
+                
+                track.points.forEach(p => {
+                    if (p.elevation !== null) {
+                        minElevation = Math.min(minElevation, p.elevation);
+                        maxElevation = Math.max(maxElevation, p.elevation);
+                    }
+                });
+                
+                html += `<p><strong>Elevation Range:</strong> ${minElevation.toFixed(0)}m - ${maxElevation.toFixed(0)}m</p>`;
+                
+                // Add color scale legend
+                html += `
+                <div class="elevation-legend">
+                    <p><strong>Elevation Color Scale</strong></p>
+                    <div class="legend-gradient">
+                        <div style="background: linear-gradient(to right, green, yellow, red); height: 15px; width: 100%; border-radius: 3px;"></div>
+                        <div class="legend-labels">
+                            <span>${minElevation.toFixed(0)}m</span>
+                            <span>${((minElevation + maxElevation) / 2).toFixed(0)}m</span>
+                            <span>${maxElevation.toFixed(0)}m</span>
+                        </div>
+                    </div>
+                </div>`;
+            }
         }
         
         if (stats.startTime && stats.endTime) {

@@ -202,6 +202,27 @@ button:hover {
     border-radius: 0 4px 4px 0;
 }
 
+/* Elevation legend */
+.elevation-legend {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.legend-gradient {
+    margin-top: 8px;
+}
+
+.legend-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    font-size: 12px;
+    color: #666;
+}
+
 /* Utilities */
 .hidden {
     display: none;
